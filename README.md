@@ -34,3 +34,30 @@ poetry run uvicorn agendou_api.main:app --reload
 ## Exemplo de rota protegida por role
 
 `GET /auth/admin-only-example` exige `company_admin` ou `super_admin`.
+
+## Empresas, configurações e unidades (multi-tenant)
+
+Todas as rotas abaixo com `{company_id}` exigem JWT. Usuários do tenant só acessam a própria empresa (`user.company_id`); `super_admin` acessa qualquer `company_id`.
+
+**Papéis (resumo):**
+
+- `GET` empresa / settings / unidades: `company_admin`, `manager`, `staff`, `super_admin`
+- `PATCH` empresa e settings: `company_admin`, `super_admin`
+- Criar/editar unidades: `company_admin`, `manager`, `super_admin`
+- `DELETE` unidade (desativa, `status=inactive`): `company_admin`, `super_admin`
+
+**Onboarding público (cadastro de empresa + primeiro admin):**
+
+- `POST /companies/onboarding` — sem `Authorization`. Cria empresa, `company_settings` padrão, usuário `company_admin` e devolve `access_token` + dados da empresa e do usuário.
+
+**Outros endpoints:**
+
+- `GET /companies/me` — empresa do usuário autenticado (exige `company_id` no usuário).
+- `GET /companies` — lista paginada (`skip`, `limit`); apenas `super_admin`.
+- `GET/PATCH /companies/{company_id}`
+- `GET/PATCH /companies/{company_id}/settings`
+- `GET/POST /companies/{company_id}/units`, `GET/PATCH /companies/{company_id}/units/{unit_id}`, `DELETE ...` (soft delete)
+
+**Telas (cliente HTTP):** use `POST /companies/onboarding` no fluxo de cadastro; guarde o `access_token` e chame as rotas de unidades com `Authorization: Bearer ...` e o `company_id` retornado (ou o do token).
+
+Em produção, proteja o onboarding com rate limiting ou CAPTCHA no gateway.
