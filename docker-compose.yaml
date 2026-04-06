@@ -28,6 +28,7 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql+asyncpg://admin:admin123@postgres:5432/agendou_db
+      JWT_SECRET_KEY: dev-docker-jwt-secret-at-least-32-chars!!
     depends_on:
       postgres:
         condition: service_healthy

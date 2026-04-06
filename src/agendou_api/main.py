@@ -6,7 +6,8 @@ from agendou_api.shared.infrastructure.database.session import (
     create_async_engine_from_settings,
     dispose_async_engine,
 )
-from agendou_api.users.infrastructure.http.routes.user_routes import router as users_router
+from agendou_api.users.infrastructure.http.routes.auth_routes import router as auth_router
+from agendou_api.users.infrastructure.http.routes.me_routes import router as me_router
 
 
 @asynccontextmanager
@@ -17,7 +18,8 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(users_router)
+app.include_router(auth_router)
+app.include_router(me_router)
 
 
 @app.get("/")
