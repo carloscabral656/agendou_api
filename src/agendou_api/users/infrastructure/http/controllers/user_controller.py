@@ -1,10 +1,10 @@
-class UserController:
-    def __init__(self, create_user_use_case):
-        self.create_user_use_case = create_user_use_case
+from agendou_api.users.application.commands.create_user_use_case import CreateUserUseCase
+from agendou_api.users.domain.user import User
 
-    def create_user(self, payload: dict):
-        user = self.create_user_use_case.execute(
-            name=payload["name"],
-            email=payload["email"]
-        )
-        return {"name": user.name, "email": user.email}
+
+class UserController:
+    def __init__(self, create_user_use_case: CreateUserUseCase) -> None:
+        self._create_user_use_case = create_user_use_case
+
+    async def create_user(self, *, name: str, email: str) -> User:
+        return await self._create_user_use_case.execute(name=name, email=email)
